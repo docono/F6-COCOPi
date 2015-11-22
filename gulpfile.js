@@ -32,7 +32,7 @@ var concat = require('gulp-concat');
 var pwd = './template';
 var reload = browserSync.reload;
 
-gulp.task('browser-sync', function () {
+gulp.task('Browser-Sync', function () {
     browserSync.init({
         server: {
             baseDir: pwd
@@ -43,13 +43,13 @@ gulp.task('browser-sync', function () {
 });
 
 // Shell
-gulp.task('COCOPi from git', shell.task([
+gulp.task('COCOPi-from-GIT', shell.task([
   'git clone https://github.com/COCOPi/cocopi-kickstart.git cocopi',
   'rm -rf ./cocopi/site/theme/css',
   'rm -rf ./cocopi/site/theme/js',
   'rm ./cocopi/site/theme/media/logo.svg',
   'git add *',
-  'git commit -m "adding cocopi to git"'
+  'git commit -m"adding cocopi to git"'
 ]));
 
 
