@@ -43,27 +43,30 @@ gulp.task('browser-sync', function () {
 });
 
 // Shell
-gulp.task('COCOPi', shell.task([
-  'cd site',
-  'git clone https://github.com/COCOPi/cocopi-kickstart.git'
-]))
+gulp.task('COCOPi from git', shell.task([
+  'git clone https://github.com/COCOPi/cocopi-kickstart.git cocopi',
+  'rm -rf ./cocopi/site/theme/css',
+  'rm -rf ./cocopi/site/theme/js',
+  'rm ./cocopi/site/theme/media/logo.svg',
+  'git add *',
+  'git commit -m "adding cocopi to git"'
+]));
 
 
 // scss Task
 var sassInput = './template/scss/**/*.scss';
-var sassOutput = './pagekit/packages/docono/theme-light/css';
+var sassOutput = './cocopi/site/theme/css';
 
 var sassOptions = {
     errLogToConsole: true,
     outputStyle: 'compressed',
     includePaths: [
-        'resources/assets/bower_components/foundation/scss',
-        'resources/assets/bower_components/uikit/scss'
+        './template/bower_components/foundation/scss'
     ]
 };
 
 var autoprefixerOptions = {
-    browsers: ['last 2 versions', '> 5%', 'Firefox ESR']
+  browsers: ['last 2 versions', 'ie >= 9', 'and_chr >= 2.3']
 };
 
 gulp.task('sass', function () {
@@ -80,7 +83,7 @@ gulp.task('sass', function () {
 // SASS Documentation Task
 gulp.task('sassdoc', function () {
     var sassDocOptions = {
-        dest: './public/sassdoc',
+        dest: './sassdoc',
         verbose: true
     };
 
@@ -98,7 +101,7 @@ var htmlOptions = {
     quoteCharacter: '"'
 };
 
-gulp.task('html', function () {
+gulp.task('HTML Optimization', function () {
     return gulp.src(htmlInput)
         .pipe(htmlmin(htmlOptions))
         .pipe(gulp.dest(htmlOutput))
@@ -106,9 +109,9 @@ gulp.task('html', function () {
 
 
 // Image Optimization Task
-var imageInput = './resources/assets/img/**/*';
-var imageOutput = './public/assets/img';
-gulp.task('images', function () {
+var imageInput = './template/media/**/*';
+var imageOutput = './site/theme/media';
+gulp.task('Images Optimization', function () {
     return gulp.src(imageInput)
         .pipe(imagemin({
             progressive: true,
