@@ -28,17 +28,19 @@ var sassDocPath = './sassdoc';
 
 
 // Browser Sync
-var pwd = templatePath;
+var pwd = themePath;
 var reload = browserSync.reload;
+var watchfile = 'layout.html'
 
 gulp.task('Browser-Sync', function () {
     browserSync.init({
         server: {
-            baseDir: pwd
+            baseDir: pwd,
+            index: watchfile
         }
     });
 
-    gulp.watch("*.html").on("change", browserSync.reload);
+    gulp.watch(watchfile).on("change", browserSync.reload);
 });
 
 // Shell
@@ -142,13 +144,13 @@ gulp.task('Javascript-Optimization', function () {
 // Glup Watcher
 gulp.task('Gulp-Watcher', function () {
     gulp
-        .watch(sassInput, ['sass'])
+        .watch(sassInput, ['Libsass-SCSS'])
         .on('change', function (event) {
             console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
         });
 
-    gulp.watch(htmlInput, ['html']).on('change', browserSync.reload);
-    gulp.watch(inputJS, ['jsConcat']);
+    gulp.watch(htmlInput, ['HTML-Optimization']).on('change', browserSync.reload);
+    gulp.watch(inputJS, ['Javascript-Optimization']);
 
 });
 
