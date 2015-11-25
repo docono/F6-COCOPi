@@ -27,7 +27,6 @@ var foundationSCSSPath = foundationPath + '/scss';
 var sassDocPath = './sassdoc';
 
 
-
 // Browser Sync
 var pwd = templatePath;
 var reload = browserSync.reload;
@@ -48,6 +47,7 @@ gulp.task('COCOPi-from-GIT', shell.task([
   'rm -rf ./cocopi/site/theme/css',
   'rm -rf ./cocopi/site/theme/js',
   'rm ./cocopi/site/theme/media/logo.svg',
+  'rm -rf ./cocopi/.git',
   'git add *',
   'git commit -m"adding cocopi to git"'
 ]));
