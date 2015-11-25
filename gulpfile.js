@@ -5,31 +5,31 @@
 * @version 0.1
 */
 
-
 // Requirements
 var gulp = require('gulp');
 var browserSync = require('browser-sync').create();
 var shell = require('gulp-shell');
-
-// Requirements Image Optimization
 var imagemin = require('gulp-imagemin');
-
-// Requirements SASS
 var sass = require('gulp-sass');
 var sourcemaps = require('gulp-sourcemaps');
 var autoprefixer = require('gulp-autoprefixer');
 var sassdoc = require('sassdoc');
-
-// Requirements HTML
 var htmlmin = require('gulp-htmlmin');
-
-// Requirements JS
 var uglify = require('gulp-uglify');
 var concat = require('gulp-concat');
 
 
+// Working Paths
+var themePath = './cocopi/site/theme';
+var templatePath = './template';
+var foundationPath = templatePath + 'bower_components/foundation';
+var foundationSCSSPath = foundationPath + '/scss';
+var sassDocPath = './sassdoc';
+
+
+
 // Browser Sync
-var pwd = './template';
+var pwd = templatePath;
 var reload = browserSync.reload;
 
 gulp.task('Browser-Sync', function () {
@@ -53,23 +53,24 @@ gulp.task('COCOPi-from-GIT', shell.task([
 ]));
 
 
-// scss Task
-var sassInput = './template/scss/**/*.scss';
-var sassOutput = './cocopi/site/theme/css';
-
+// Libsass SCSS
+var sassInput = templatePath + '/scss/**/*.scss';
+var sassOutput = themePath + '/css';
 var sassOptions = {
     errLogToConsole: true,
     outputStyle: 'compressed',
     includePaths: [
-        './template/bower_components/foundation/scss'
+        foundationSCSSPath
     ]
 };
 
+// Autoprefix for Browsers
 var autoprefixerOptions = {
   browsers: ['last 2 versions', 'ie >= 9', 'and_chr >= 2.3']
 };
 
-gulp.task('sass', function () {
+
+gulp.task('Libsass-SCSS', function () {
     return gulp
         .src(sassInput)
         //.pipe(sourcemaps.init())
@@ -80,38 +81,39 @@ gulp.task('sass', function () {
         .resume();
 });
 
-// SASS Documentation Task
-gulp.task('sassdoc', function () {
+// SASS Documentation
+gulp.task('SassDocumentation', function () {
     var sassDocOptions = {
-        dest: './sassdoc',
+        dest: sassDocPath,
         verbose: true
     };
 
-    return gulp.src('./resources/**/*.scss')
+    return gulp.src(templatePath + '/**/*.scss')
         .pipe(sassdoc(sassDocOptions));
 });
 
 
-// HTML Task
-var htmlInput = './resources/*.html';
-var htmlOutput = './public';
+// HTML Optimization
+var htmlInput = templatePath + '/*.html';
+var htmlOutput = themePath;
 var htmlOptions = {
     collapseWhitespace: true,
     removeComments: true,
     quoteCharacter: '"'
 };
 
-gulp.task('HTML Optimization', function () {
+gulp.task('HTML-Optimization', function () {
     return gulp.src(htmlInput)
         .pipe(htmlmin(htmlOptions))
         .pipe(gulp.dest(htmlOutput))
 });
 
 
-// Image Optimization Task
-var imageInput = './template/media/**/*';
-var imageOutput = './site/theme/media';
-gulp.task('Images Optimization', function () {
+// Image Optimization
+var imageInput = templatePath + '/media/**/*';
+var imageOutput = themePath +'/media';
+
+gulp.task('Image-Optimization', function () {
     return gulp.src(imageInput)
         .pipe(imagemin({
             progressive: true,
@@ -122,23 +124,23 @@ gulp.task('Images Optimization', function () {
 });
 
 
-// JS Tasks
+// Javascript Optimization
 var inputJS = [
-    './resources/assets/bower_components/jquery/dist/jquery.min.js',
-    './resources/assets/bower_components/foundation/js/foundation.min.js',
-    './resources/assets/js/app.js'
+    foundationPath + '/jquery/dist/jquery.min.js',
+    foundationPath + '/js/foundation.min.js',
+    templatePath + '/js/app.js'
 ];
-var outputJS = './pagekit/packages/docono/theme-light/js';
+var outputJS = themePath + '/js';
 
-gulp.task('jsConcat', function () {
+gulp.task('Javascript-Optimization', function () {
     gulp.src(inputJS)
-        .pipe(concat('all.js'))
+        .pipe(concat('app.js'))
         .pipe(gulp.dest(outputJS));
 });
 
 
-//Watch task
-gulp.task('watch', function () {
+// Glup Watcher
+gulp.task('Gulp-Watcher', function () {
     gulp
         .watch(sassInput, ['sass'])
         .on('change', function (event) {
@@ -150,5 +152,14 @@ gulp.task('watch', function () {
 
 });
 
-// Default Task
-gulp.task('default', ['sass', 'html', 'jsConcat', 'watch' /*, possible other tasks... */]);
+// Gulp Default
+gulp.task(
+  'default',
+  [
+    'Libsass-SCSS',
+    'HTML-Optimization',
+    'Javascript-Optimization',
+    'Gulp-Watcher'
+     /*, possible other tasks... */
+  ]
+);
