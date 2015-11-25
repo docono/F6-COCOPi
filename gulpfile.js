@@ -20,6 +20,7 @@ var concat = require('gulp-concat');
 
 
 // Working Paths
+var cocopiRootPath = './cocopi';
 var themePath = './cocopi/site/theme';
 var templatePath = './template';
 var foundationPath = templatePath + 'bower_components/foundation';
@@ -28,19 +29,19 @@ var sassDocPath = './sassdoc';
 
 
 // Browser Sync
-var pwd = themePath;
+var pwd = cocopiRootPath;
 var reload = browserSync.reload;
-var watchfile = 'layout.html'
+// var watchfile = th¨emePath + 'layout.html';
 
 gulp.task('Browser-Sync', function () {
     browserSync.init({
         server: {
             baseDir: pwd,
-            index: watchfile
+            // index: watchfile
         }
     });
 
-    gulp.watch(watchfile).on("change", browserSync.reload);
+    // gulp.watch(watchfile).on("change", browserSync.reload);
 });
 
 // Shell
