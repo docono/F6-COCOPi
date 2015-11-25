@@ -5,68 +5,75 @@
 * @version 0.1
 */
 
-
 // Requirements
 var gulp = require('gulp');
 var browserSync = require('browser-sync').create();
 var shell = require('gulp-shell');
-
-// Requirements Image Optimization
 var imagemin = require('gulp-imagemin');
-
-// Requirements SASS
 var sass = require('gulp-sass');
 var sourcemaps = require('gulp-sourcemaps');
 var autoprefixer = require('gulp-autoprefixer');
 var sassdoc = require('sassdoc');
-
-// Requirements HTML
 var htmlmin = require('gulp-htmlmin');
-
-// Requirements JS
 var uglify = require('gulp-uglify');
 var concat = require('gulp-concat');
 
 
-// Browser Sync
-var pwd = './template';
-var reload = browserSync.reload;
+// Working Paths
+var cocopiRootPath = './cocopi';
+var themePath = './cocopi/site/theme';
+var templatePath = './template';
+var foundationPath = templatePath + 'bower_components/foundation';
+var foundationSCSSPath = foundationPath + '/scss';
+var sassDocPath = './sassdoc';
 
-gulp.task('browser-sync', function () {
+
+// Browser Sync
+var pwd = cocopiRootPath;
+var reload = browserSync.reload;
+// var watchfile = th¨emePath + 'layout.html';
+
+gulp.task('Browser-Sync', function () {
     browserSync.init({
         server: {
-            baseDir: pwd
+            baseDir: pwd,
+            // index: watchfile
         }
     });
 
-    gulp.watch("*.html").on("change", browserSync.reload);
+    // gulp.watch(watchfile).on("change", browserSync.reload);
 });
 
 // Shell
-gulp.task('COCOPi', shell.task([
-  'cd site',
-  'git clone https://github.com/COCOPi/cocopi-kickstart.git'
-]))
+gulp.task('COCOPi-from-GIT', shell.task([
+  'git clone https://github.com/COCOPi/cocopi-kickstart.git cocopi',
+  'rm -rf ./cocopi/site/theme/css',
+  'rm -rf ./cocopi/site/theme/js',
+  'rm ./cocopi/site/theme/media/logo.svg',
+  'rm -rf ./cocopi/.git',
+  'git add *',
+  'git commit -m"adding cocopi to git"'
+]));
 
 
-// scss Task
-var sassInput = './template/scss/**/*.scss';
-var sassOutput = './pagekit/packages/docono/theme-light/css';
-
+// Libsass SCSS
+var sassInput = templatePath + '/scss/**/*.scss';
+var sassOutput = themePath + '/css';
 var sassOptions = {
     errLogToConsole: true,
     outputStyle: 'compressed',
     includePaths: [
-        'resources/assets/bower_components/foundation/scss',
-        'resources/assets/bower_components/uikit/scss'
+        foundationSCSSPath
     ]
 };
 
+// Autoprefix for Browsers
 var autoprefixerOptions = {
-    browsers: ['last 2 versions', '> 5%', 'Firefox ESR']
+  browsers: ['last 2 versions', 'ie >= 9', 'and_chr >= 2.3']
 };
 
-gulp.task('sass', function () {
+
+gulp.task('Libsass-SCSS', function () {
     return gulp
         .src(sassInput)
         //.pipe(sourcemaps.init())
@@ -77,38 +84,39 @@ gulp.task('sass', function () {
         .resume();
 });
 
-// SASS Documentation Task
-gulp.task('sassdoc', function () {
+// SASS Documentation
+gulp.task('SassDocumentation', function () {
     var sassDocOptions = {
-        dest: './public/sassdoc',
+        dest: sassDocPath,
         verbose: true
     };
 
-    return gulp.src('./resources/**/*.scss')
+    return gulp.src(templatePath + '/**/*.scss')
         .pipe(sassdoc(sassDocOptions));
 });
 
 
-// HTML Task
-var htmlInput = './resources/*.html';
-var htmlOutput = './public';
+// HTML Optimization
+var htmlInput = templatePath + '/*.html';
+var htmlOutput = themePath;
 var htmlOptions = {
     collapseWhitespace: true,
     removeComments: true,
     quoteCharacter: '"'
 };
 
-gulp.task('html', function () {
+gulp.task('HTML-Optimization', function () {
     return gulp.src(htmlInput)
         .pipe(htmlmin(htmlOptions))
         .pipe(gulp.dest(htmlOutput))
 });
 
 
-// Image Optimization Task
-var imageInput = './resources/assets/img/**/*';
-var imageOutput = './public/assets/img';
-gulp.task('images', function () {
+// Image Optimization
+var imageInput = templatePath + '/media/**/*';
+var imageOutput = themePath +'/media';
+
+gulp.task('Image-Optimization', function () {
     return gulp.src(imageInput)
         .pipe(imagemin({
             progressive: true,
@@ -119,33 +127,42 @@ gulp.task('images', function () {
 });
 
 
-// JS Tasks
+// Javascript Optimization
 var inputJS = [
-    './resources/assets/bower_components/jquery/dist/jquery.min.js',
-    './resources/assets/bower_components/foundation/js/foundation.min.js',
-    './resources/assets/js/app.js'
+    foundationPath + '/jquery/dist/jquery.min.js',
+    foundationPath + '/js/foundation.min.js',
+    templatePath + '/js/app.js'
 ];
-var outputJS = './pagekit/packages/docono/theme-light/js';
+var outputJS = themePath + '/js';
 
-gulp.task('jsConcat', function () {
+gulp.task('Javascript-Optimization', function () {
     gulp.src(inputJS)
-        .pipe(concat('all.js'))
+        .pipe(concat('app.js'))
         .pipe(gulp.dest(outputJS));
 });
 
 
-//Watch task
-gulp.task('watch', function () {
+// Glup Watcher
+gulp.task('Gulp-Watcher', function () {
     gulp
-        .watch(sassInput, ['sass'])
+        .watch(sassInput, ['Libsass-SCSS'])
         .on('change', function (event) {
             console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
         });
 
-    gulp.watch(htmlInput, ['html']).on('change', browserSync.reload);
-    gulp.watch(inputJS, ['jsConcat']);
+    gulp.watch(htmlInput, ['HTML-Optimization']).on('change', browserSync.reload);
+    gulp.watch(inputJS, ['Javascript-Optimization']);
 
 });
 
-// Default Task
-gulp.task('default', ['sass', 'html', 'jsConcat', 'watch' /*, possible other tasks... */]);
+// Gulp Default
+gulp.task(
+  'default',
+  [
+    'Libsass-SCSS',
+    'HTML-Optimization',
+    'Javascript-Optimization',
+    'Gulp-Watcher'
+     /*, possible other tasks... */
+  ]
+);
